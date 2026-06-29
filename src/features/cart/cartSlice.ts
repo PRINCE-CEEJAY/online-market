@@ -20,6 +20,7 @@ export const cartSlice = createSlice({
       );
       if (existingItem) {
         existingItem.quantity += 1;
+        return;
       } else {
         const newItem = {
           ...action.payload,

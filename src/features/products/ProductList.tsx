@@ -1,9 +1,10 @@
+import { useSelector } from 'react-redux';
 import { useGetProductsQuery } from '../../services/api';
 import { ProductCard } from './ProductCard';
 export default function ProductList() {
   const { data: products, isLoading, isError } = useGetProductsQuery();
-
-  console.log(products);
+  const { cart } = useSelector((state) => state.cart);
+  console.log(cart);
 
   if (isLoading)
     return (
