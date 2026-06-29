@@ -15,6 +15,7 @@ import {
   NavigationMenuTrigger,
 } from './ui/navigation-menu';
 import { ModeToggle } from './mode-toggle';
+import { useAppSelector } from '../hooks/redux-hooks';
 
 const categories = [
   { title: 'New Arrivals', to: '/new' },
@@ -27,6 +28,9 @@ const categories = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { cart } = useAppSelector((state) => state.cart);
+
+  const totalCart = cart?.length || 0;
 
   return (
     <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60'>
@@ -142,7 +146,7 @@ export function Navbar() {
           >
             <ShoppingCart className='h-5 w-5' />
             <Badge className='absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs'>
-              3
+              {totalCart}
             </Badge>
           </Button>
         </div>
