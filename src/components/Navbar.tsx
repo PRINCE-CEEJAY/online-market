@@ -28,9 +28,9 @@ const categories = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const { cart } = useAppSelector((state) => state.cart);
+  const { cart: cartItems } = useAppSelector((state) => state.cart);
 
-  const totalCart = cart?.length || 0;
+  const totalCart = cartItems?.length || 0;
 
   return (
     <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60'>

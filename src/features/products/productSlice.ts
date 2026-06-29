@@ -5,10 +5,24 @@ interface ProductState {
   products: Product[];
 }
 const initialProducts: ProductState = {
-  products: [],
+  products: [
+    {
+      id: 1,
+      title: 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops',
+      price: 109.95,
+      description:
+        'Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday',
+      category: "men's clothing",
+      image: 'https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png',
+      rating: {
+        rate: 3.9,
+        count: 120,
+      },
+    },
+  ],
 };
 export const productSlice = createSlice({
-  name: 'cart',
+  name: 'products',
   initialState: initialProducts,
   reducers: {
     addProducts: (state, action: PayloadAction<Product>) => {
@@ -22,6 +36,10 @@ export const productSlice = createSlice({
       if (!existingProduct) {
         state.products.push(newProduct);
       }
+    },
+
+    createProductArray: (state, action) => {
+      state.products = action.payload;
     },
 
     removeProduct: (state, action: PayloadAction<number>) => {
@@ -41,7 +59,7 @@ export const productSlice = createSlice({
   },
 });
 
-export const { addProducts, removeProduct, updateProduct } =
+export const { createProductArray, addProducts, removeProduct, updateProduct } =
   productSlice.actions;
 
 export default productSlice;

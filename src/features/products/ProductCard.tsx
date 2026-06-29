@@ -8,11 +8,9 @@ import {
 import { Badge } from '../../components/ui/badge';
 import type { Product } from '../../types/types';
 import { addToCart } from '../cart/cartSlice';
-import { useDispatch } from 'react-redux';
-
+import { useAppDispatch } from '../../hooks/redux-hooks';
 export function ProductCard({ product }: { product: Product }) {
-  const dispatch = useDispatch();
-  if (!product) return null;
+  const dispatch = useAppDispatch();
 
   function handleAddToCart(product: Product) {
     dispatch(addToCart(product));
@@ -53,7 +51,10 @@ export function ProductCard({ product }: { product: Product }) {
         <span className='text-2xl font-bold'>${product.price}</span>
         <button
           className='inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer'
-          onClick={() => handleAddToCart(product)}
+          onClick={() => {
+            console.log(product);
+            return handleAddToCart(product);
+          }}
         >
           Add to Cart
         </button>

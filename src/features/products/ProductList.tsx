@@ -1,11 +1,16 @@
 import { useGetProductsQuery } from '../../services/api';
 import { ProductCard } from './ProductCard';
-import { useAppSelector } from '../../hooks/redux-hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
+import { useEffect } from 'react';
+import { createProductArray } from './productSlice';
 export default function ProductList() {
-  const { data: products, isLoading, isError } = useGetProductsQuery();
-  const { cart } = useAppSelector((state) => state.cart);
+  const { data, isLoading, isError } = useGetProductsQuery();
+  const dispatch = useAppDispatch();
+  const { products } = useAppSelector((state) => state.products);
 
-  console.log(cart); //for now
+  useEffect(() => {
+    dispatch(createProductArray(data));
+  }, [data, dispatch]);
 
   if (isLoading)
     return (
