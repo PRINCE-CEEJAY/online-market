@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Search, User, Menu } from 'lucide-react';
+import {
+  ShoppingCart,
+  Search,
+  User,
+  Menu,
+  ShoppingBasketIcon,
+} from 'lucide-react';
 
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -18,7 +24,6 @@ import { ModeToggle } from './mode-toggle';
 import { useAppDispatch, useAppSelector } from '../hooks/redux-hooks';
 import { useDebouncedSearch } from '../hooks/useDebouncedSearch';
 import { setSearch } from '../features/filters/filterSlice';
-
 const categories = [
   { title: 'New Arrivals', to: '/new' },
   { title: 'Best Sellers', to: '/bestsellers' },
@@ -72,7 +77,9 @@ export function Navbar() {
               className='flex items-center'
               onClick={() => setIsOpen(false)}
             >
-              <span className='font-bold'>StoreLogo</span>
+              <span className='font-bold'>
+                <ShoppingBasketIcon size={50} />
+              </span>
             </Link>
             <nav className='mt-8 flex flex-col gap-4'>
               {categories.map((cat) => (
@@ -93,8 +100,9 @@ export function Navbar() {
           to='/'
           className='flex items-center space-x-2'
         >
-          <span className='font-bold text-xl hidden md:inline-block'>
-            StoreLogo
+          <span className='font-bold text-xl hidden md:flex items-center'>
+            <ShoppingBasketIcon size={50} />
+            <h1 className='fancy'>Cee-Shopify</h1>
           </span>
         </Link>
 
