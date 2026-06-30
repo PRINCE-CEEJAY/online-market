@@ -6,6 +6,7 @@ import {
   User,
   Menu,
   ShoppingBasketIcon,
+  User2,
 } from 'lucide-react';
 
 import { Button } from './ui/button';
@@ -169,6 +170,7 @@ export function Navbar() {
             </Badge>
           </Button>
         </div>
+        <User2 />
       </div>
     </header>
   );
