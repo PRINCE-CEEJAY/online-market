@@ -6,17 +6,25 @@ import Filters from '../filters/Filters';
 
 export default function ProductList() {
   const { data: products, isLoading, isError } = useGetProductsQuery();
-  const { search, category } = useAppSelector((state) => state.filters);
+  const { search, category, sort } = useAppSelector((state) => state.filters);
 
   const filteredProducts = useMemo(() => {
     if ((!search || search === '') && category.toLowerCase() == 'all')
       return products;
-    return products?.filter(
+    const filtered = products?.filter(
       (item) =>
         item.title.toLowerCase().includes(search.toLowerCase()) &&
         item.category.toLowerCase() === category.toLowerCase(),
     );
-  }, [search, products, category]);
+    if (sort) {
+      if (sort == 'asc') {
+        return filtered?.sort((a, b) => a.price - b.price);
+      } else {
+        return filtered?.sort((a, b) => b.price - a.price);
+      }
+    }
+    return filtered;
+  }, [search, products, category, sort]);
 
   if (isLoading)
     return (

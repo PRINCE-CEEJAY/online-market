@@ -1,4 +1,4 @@
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowDownAz, ArrowDownZA } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
-import { setCategory } from './filterSlice';
+import { setCategory, setSortPrice } from './filterSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 
 export default function Filters({
@@ -17,6 +17,14 @@ export default function Filters({
   const dispatch = useAppDispatch();
   const { category } = useAppSelector((state) => state.filters);
 
+  function sortAsc() {
+    dispatch(setSortPrice('asc'));
+  }
+
+  function sortDesc() {
+    dispatch(setSortPrice('desc'));
+  }
+
   return (
     <Card className='w-full'>
       <CardTitle className='text-center text-xl font-bold'>
@@ -26,7 +34,7 @@ export default function Filters({
         Filter the categories of the displayed products as well as sort in
         ascending or descending price
       </CardDescription>
-      <CardContent className='flex items-center justify-between'>
+      <CardContent className='flex items-center justify-evenly'>
         <select
           className='w-sm p-2 rounded-md font-bold cursor-pointer bg-secondary'
           value={category}
@@ -41,12 +49,22 @@ export default function Filters({
         <h1 className='text-center text-xl font-bold'>
           Product Count: {productCount}
         </h1>
-        <Button
-          className='cursor-pointer w-32'
-          variant={'outline'}
-        >
-          <ArrowUpDown />
-        </Button>
+        <section className='flex items-center gap-6 '>
+          <Button
+            className='cursor-pointer py-6 px-1 scale-150 '
+            variant={'outline'}
+            onClick={sortAsc}
+          >
+            <ArrowDownAz size={50} />
+          </Button>
+          <Button
+            className='cursor-pointer py-6 px-1 scale-150 '
+            variant={'outline'}
+            onClick={sortDesc}
+          >
+            <ArrowDownZA />
+          </Button>
+        </section>
       </CardContent>
     </Card>
   );

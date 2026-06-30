@@ -4,7 +4,9 @@ import Cart from './features/cart/Cart';
 import Users from './features/users/Users';
 import NotFound from './features/NotFound';
 import ProductDetail from './features/products/ProductDetail';
+import { runFirebaseTest } from './test-firebase';
 export default function App() {
+  runFirebaseTest();
   return (
     <Routes>
       <Route

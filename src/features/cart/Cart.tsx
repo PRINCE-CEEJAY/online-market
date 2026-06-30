@@ -3,12 +3,13 @@ import {
   decrementQuantity,
   incrementQuantity,
   removeFromCart,
+  clearCart,
 } from './cartSlice';
 import { Card, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button, buttonVariants } from '../../components/ui/button';
 import { Separator } from '../../components/ui/separator';
 import { ScrollArea } from '../../components/ui/scroll-area';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, Trash2Icon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 
@@ -22,6 +23,15 @@ const Cart = () => {
       0,
     );
   }, [cartItems]);
+
+  function handleClearCart() {
+    const confirm = window.confirm(
+      'Are you sure you want to remove everything ?',
+    );
+    if (confirm) {
+      dispatch(clearCart());
+    }
+  }
 
   if (!cartItems || cartItems.length === 0) {
     return (
@@ -130,6 +140,13 @@ const Cart = () => {
                 </div>
               ))}
             </div>
+            <Button
+              variant={'destructive'}
+              className='px-8 py-6 cursor-pointer mt-4 mx-auto w-full font-bold text-xl'
+              onClick={handleClearCart}
+            >
+              <Trash2Icon /> Clear Cart
+            </Button>
           </ScrollArea>
         </div>
 
