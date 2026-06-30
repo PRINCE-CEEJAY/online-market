@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initalFilters = {
   search: '',
   category: '',
-  sortPrice: '',
+  sort: '',
 };
 
 export const filterSlice = createSlice({
@@ -17,7 +17,7 @@ export const filterSlice = createSlice({
       state.category = action.payload;
     },
     setSortPrice: (state, action) => {
-      state.sortPrice = action.payload;
+      state.sort = action.payload;
     },
   },
 });

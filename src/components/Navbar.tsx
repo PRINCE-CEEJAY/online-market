@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Search, User, Menu } from 'lucide-react';
 
@@ -15,7 +15,9 @@ import {
   NavigationMenuTrigger,
 } from './ui/navigation-menu';
 import { ModeToggle } from './mode-toggle';
-import { useAppSelector } from '../hooks/redux-hooks';
+import { useAppDispatch, useAppSelector } from '../hooks/redux-hooks';
+import { useDebouncedSearch } from '../hooks/useDebouncedSearch';
+import { setSearch } from '../features/filters/filterSlice';
 
 const categories = [
   { title: 'New Arrivals', to: '/new' },
@@ -29,8 +31,15 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { cart: cartItems } = useAppSelector((state) => state.cart);
+  const dispatch = useAppDispatch();
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebouncedSearch(searchInput);
 
   const totalCart = cartItems?.length || 0;
+
+  useEffect(() => {
+    dispatch(setSearch(debouncedSearch));
+  }, [dispatch, debouncedSearch]);
 
   return (
     <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60'>
@@ -121,6 +130,8 @@ export function Navbar() {
           <div className='relative w-full'>
             <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
             <Input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               type='search'
               placeholder='Search products...'
               className='w-full pl-8'
