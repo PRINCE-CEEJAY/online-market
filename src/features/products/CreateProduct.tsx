@@ -15,46 +15,81 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Product } from '@/types/types';
 import { useState, useEffect } from 'react';
-import { zod } from 'zod';
+import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { Resolver } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const productSchema = z.object({
+  title: z.string().min(1, 'Product name is required'),
+  price: z
+    .number({ invalid_type_error: 'Price is required' })
+    .positive('Price must be greater than 0'),
+  category: z.string().min(1, 'Please select a category'),
+  image: z
+    .any()
+    .refine((file) => file instanceof File, 'Product image is required'),
+  description: z.string().min(1, 'Description is required'),
+  rating: z.object({
+    rate: z.number().min(0).max(10, 'Rating must be between 0 and 10'),
+    count: z.number().int().min(0, 'Review count cannot be negative'),
+  }),
+});
+
+type ProductFormValues = z.infer<typeof productSchema>;
 
 export default function CreateProduct() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [productInput, setProductInput] = useState<Omit<Product, 'id'>>({
-    title: '',
-    price: 0,
-    category: '',
-    image: '',
-    description: '',
-    rating: { rate: 0, count: 0 },
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      title: '',
+      price: undefined,
+      category: '',
+      image: undefined,
+      description: '',
+      rating: { rate: 0, count: 0 },
+    },
   });
 
-  // Cleanup memory on unmount or when file changes
+  // watch image field to safely handle preview unmounting memory cleanup
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const imageFile = watch('image');
+
   useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
+    if (imageFile instanceof File) {
+      const url = URL.createObjectURL(imageFile);
+      setPreviewUrl(url);
+
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [imageFile]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      // Revoke old URL before setting new one to avoid leaks
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      setPreviewUrl(URL.createObjectURL(file));
-      // In a real app, you'd likely store the File object itself, not just the URL
-      setProductInput((prev) => ({ ...prev, image: file.name }));
+      // Set value in react-hook-form and trigger validation
+      setValue('image', file, { shouldValidate: true });
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    console.log('Submitting:', productInput);
+  // 4. Handle valid submission
+  function onSubmit(data: ProductFormValues) {
+    console.log('Submitting Validated Data:', data);
+    // data.image is an actual File object here, ready for your API
+
+    // reset fields after submission
+    reset();
   }
 
   return (
@@ -69,7 +104,7 @@ export default function CreateProduct() {
       </CardHeader>
       <CardContent>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           className='grid gap-6'
         >
           {/* Title & Price Row */}
@@ -79,39 +114,38 @@ export default function CreateProduct() {
               <Input
                 id='title'
                 placeholder='e.g. Wireless Headphones'
-                value={productInput.title}
-                onChange={(e) =>
-                  setProductInput((prev) => ({
-                    ...prev,
-                    title: e.target.value,
-                  }))
-                }
+                {...register('title')}
               />
+              {errors.title && (
+                <p className='text-xs text-destructive'>
+                  {errors.title.message}
+                </p>
+              )}
             </div>
             <div className='space-y-2'>
               <Label htmlFor='price'>Price ($)</Label>
               <Input
                 id='price'
                 type='number'
+                step='0.01'
                 placeholder='0.00'
-                value={productInput.price}
-                onChange={(e) =>
-                  setProductInput((prev) => ({
-                    ...prev,
-                    price: Number(e.target.value),
-                  }))
-                }
+                {...register('price', { valueAsNumber: true })}
               />
+              {errors.price && (
+                <p className='text-xs text-destructive'>
+                  {errors.price.message}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Category */}
+          {/* Category (Radix Select requires manual registration value updates) */}
           <div className='space-y-2'>
             <Label htmlFor='category'>Category</Label>
             <Select
-              value={productInput.category}
+              value={watch('category')}
               onValueChange={(val) =>
-                setProductInput((prev) => ({ ...prev, category: val }))
+                setValue('category', val, { shouldValidate: true })
               }
             >
               <SelectTrigger id='category'>
@@ -126,11 +160,16 @@ export default function CreateProduct() {
                 </SelectItem>
               </SelectContent>
             </Select>
+            {errors.category && (
+              <p className='text-xs text-destructive'>
+                {errors.category.message}
+              </p>
+            )}
           </div>
 
           {/* Image Upload */}
           <div className='space-y-2'>
-            <Label>Product Image</Label>
+            <Label htmlFor='image'>Product Image</Label>
             <div className='flex items-center gap-4'>
               {previewUrl && (
                 <div className='relative h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted'>
@@ -152,6 +191,11 @@ export default function CreateProduct() {
                 <p className='mt-1 text-xs text-muted-foreground'>
                   Supported formats: JPG, PNG, WebP
                 </p>
+                {errors.image && (
+                  <p className='text-xs text-destructive mt-1'>
+                    {errors.image.message as string}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -162,14 +206,13 @@ export default function CreateProduct() {
             <Input
               id='description'
               placeholder='Describe the product features...'
-              value={productInput.description}
-              onChange={(e) =>
-                setProductInput((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
+              {...register('description')}
             />
+            {errors.description && (
+              <p className='text-xs text-destructive'>
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {/* Rating Group */}
@@ -182,14 +225,13 @@ export default function CreateProduct() {
                 min='0'
                 max='10'
                 step='0.1'
-                value={productInput.rating.rate}
-                onChange={(e) =>
-                  setProductInput((prev) => ({
-                    ...prev,
-                    rating: { ...prev.rating, rate: Number(e.target.value) },
-                  }))
-                }
+                {...register('rating.rate', { valueAsNumber: true })}
               />
+              {errors.rating?.rate && (
+                <p className='text-xs text-destructive'>
+                  {errors.rating.rate.message}
+                </p>
+              )}
             </div>
             <div className='space-y-2'>
               <Label htmlFor='count'>Review Count</Label>
@@ -197,14 +239,13 @@ export default function CreateProduct() {
                 id='count'
                 type='number'
                 min='0'
-                value={productInput.rating.count}
-                onChange={(e) =>
-                  setProductInput((prev) => ({
-                    ...prev,
-                    rating: { ...prev.rating, count: Number(e.target.value) },
-                  }))
-                }
+                {...register('rating.count', { valueAsNumber: true })}
               />
+              {errors.rating?.count && (
+                <p className='text-xs text-destructive'>
+                  {errors.rating.count.message}
+                </p>
+              )}
             </div>
           </div>
 
