@@ -173,7 +173,7 @@ export function Navbar() {
         <User2 />
         <Link
           to='/admin'
-          className={buttonVariants({ variant: 'ghost' })}
+          className={`ml-4 ${buttonVariants({ variant: 'ghost' })}`}
         >
           Admin
         </Link>
