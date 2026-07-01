@@ -4,12 +4,17 @@ import Cart from './features/cart/Cart';
 import Users from './features/users/Users';
 import NotFound from './features/NotFound';
 import ProductDetail from './features/products/ProductDetail';
+import AdminPanel from './features/admin/AdminPanel';
 export default function App() {
   return (
     <Routes>
       <Route
         path='/'
         element={<Home />}
+      />
+      <Route
+        path='/admin'
+        element={<AdminPanel />}
       />
       <Route
         path='/products/detail'

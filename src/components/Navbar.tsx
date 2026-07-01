@@ -9,7 +9,7 @@ import {
   User2,
 } from 'lucide-react';
 
-import { Button } from './ui/button';
+import { Button, buttonVariants } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
@@ -171,6 +171,12 @@ export function Navbar() {
           </Button>
         </div>
         <User2 />
+        <Link
+          to='/admin'
+          className={buttonVariants({ variant: 'ghost' })}
+        >
+          Admin
+        </Link>
       </div>
     </header>
   );
