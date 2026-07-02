@@ -60,8 +60,6 @@ export default function CreateProduct() {
     },
   });
 
-  // watch image field to safely handle preview unmounting memory cleanup
-  // eslint-disable-next-line react-hooks/incompatible-library
   const imageFile = watch('image');
 
   useEffect(() => {
@@ -83,7 +81,6 @@ export default function CreateProduct() {
     }
   }
 
-  // 4. Handle valid submission
   function onSubmit(data: ProductFormValues) {
     console.log('Submitting Validated Data:', data);
     // data.image is an actual File object here, ready for your API

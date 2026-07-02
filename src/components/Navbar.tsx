@@ -28,9 +28,6 @@ import { setSearch } from '../features/filters/filterSlice';
 const categories = [
   { title: 'New Arrivals', to: '/new' },
   { title: 'Best Sellers', to: '/bestsellers' },
-  // { title: 'Men', to: '/men' },
-  // { title: 'Women', to: '/women' },
-  // { title: 'Accessories', to: '/accessories' },
 ];
 
 export function Navbar() {

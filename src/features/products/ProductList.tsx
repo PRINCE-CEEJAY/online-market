@@ -9,21 +9,29 @@ export default function ProductList() {
   const { search, category, sort } = useAppSelector((state) => state.filters);
 
   const filteredProducts = useMemo(() => {
-    if ((!search || search === '') && category.toLowerCase() == 'all')
-      return products;
-    const filtered = products?.filter(
-      (item) =>
-        item.title.toLowerCase().includes(search.toLowerCase()) &&
-        item.category.toLowerCase() === category.toLowerCase(),
-    );
-    if (sort) {
-      if (sort == 'asc') {
-        return filtered?.sort((a, b) => a.price - b.price);
-      } else {
-        return filtered?.sort((a, b) => b.price - a.price);
-      }
+    if (!products) return [];
+
+    let result = products;
+
+    if (search || category.toLowerCase() !== 'all') {
+      result = products.filter((item) => {
+        const matchesSearch =
+          !search || item.title.toLowerCase().includes(search.toLowerCase());
+        const matchesCategory =
+          category.toLowerCase() === 'all' ||
+          item.category.toLowerCase() === category.toLowerCase();
+        return matchesSearch && matchesCategory;
+      });
     }
-    return filtered;
+
+    if (sort && sort !== '') {
+      return result.toSorted((a, b) =>
+        sort === 'asc' ? a.price - b.price : b.price - a.price,
+      );
+    }
+
+    //no sort selected so returning the filtered products as is
+    return result;
   }, [search, products, category, sort]);
 
   if (isLoading)
