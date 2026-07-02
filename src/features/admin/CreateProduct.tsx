@@ -19,12 +19,14 @@ import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useCreateProductMutation } from '@/services/firebaseApi';
 
 const productSchema = z.object({
   title: z.string().min(1, 'Product name is required'),
   price: z
-    .number({ invalid_type_error: 'Price is required' })
-    .positive('Price must be greater than 0'),
+    .number()
+    .refine((val) => !isNaN(val), { message: 'Price is required' })
+    .min(0.01, { message: 'Price must be greater than 0' }),
   category: z.string().min(1, 'Please select a category'),
   image: z
     .any()
@@ -40,6 +42,7 @@ type ProductFormValues = z.infer<typeof productSchema>;
 
 export default function CreateProduct() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [CreateProduct] = useCreateProductMutation();
 
   const {
     register,
@@ -60,6 +63,7 @@ export default function CreateProduct() {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const imageFile = watch('image');
 
   useEffect(() => {
@@ -83,7 +87,9 @@ export default function CreateProduct() {
 
   function onSubmit(data: ProductFormValues) {
     console.log('Submitting Validated Data:', data);
-    // data.image is an actual File object here, ready for your API
+
+    // create in firebase firestore
+    CreateProduct(data);
 
     // reset fields after submission
     reset();

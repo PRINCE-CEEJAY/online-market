@@ -1,10 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import apiSlice from '../services/api';
+import apiSlice from '@/services/api';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { cartSlice } from '../features/cart/cartSlice';
 import filterSlice from '../features/filters/filterSlice';
 import productSlice from '../features/products/productSlice';
 import { loadState, saveState } from '../lib/localstorage';
+import firebaseApi from '@/services/firebaseApi';
 
 const loadedState = loadState();
 const rootReducer = combineReducers({
@@ -13,13 +14,14 @@ const rootReducer = combineReducers({
   filters: filterSlice.reducer,
 
   [apiSlice.reducerPath]: apiSlice.reducer,
+  [firebaseApi.reducerPath]: firebaseApi.reducer,
 });
 
 export const store = configureStore({
   reducer: rootReducer,
   preloadedState: loadedState,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(apiSlice.middleware),
+    getDefaultMiddleware().concat(apiSlice.middleware, firebaseApi.middleware),
 });
 setupListeners(store.dispatch);
 
